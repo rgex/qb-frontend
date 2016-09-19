@@ -1,0 +1,106 @@
+﻿<html ng-app="qb">
+<head>
+<title>Panda QB</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
+<link rel="stylesheet" href="css/bootstrap-select.css">
+<link rel="stylesheet" href="css/bootstrap-slider.min.css">
+<link rel="stylesheet" href="css/ngProgress.css">
+
+<script src="js/jquery-2.0.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/typehead.min.js"></script>
+<!--<script src="js/angular.js"></script>-->
+<script src="js/angular.min.js"></script>
+<script src="js/bootstrap-select.min.js"></script>
+<script src="js/bootstrap-slider.min.js"></script>
+<script src="js/ngprogress.min.js"></script>
+<script src="js/app.js"></script>
+<script src="js/Chart.js"></script>
+<script src="js/ui.js"></script>
+</head>
+<body>
+<div ng-controller="IndexController">
+
+<div class="panel panel-default search-panel">
+  <div class="panel-heading">Filtern</div>
+  <div class="panel-body">
+  <label for="auto">OPS/ICD</label>
+  <input ng-model="searchFilter.opsIcd" type="text" name="opsIcd" id="opsIcdInput" class="typeahead form-control">
+  <label for="auto">Krankenkaus Name</label>
+  <input ng-model="searchFilter.Krankenhaus_Name" type="text" name="krankenkausName" id="krankenkausNameInput" class="typeahead form-control">
+  <label for="Ort">Ort</label>
+  <input ng-model="searchFilter.Hausanschrift_Ort" type="text" name="Ort" id="OrtInput" class="typeahead form-control">
+  <label for="land">Bundesland</label>
+  <select ng-model="searchFilter.Bundesland" id="BundeslandInput" name="Bundesland" multiple data-selected-text-format="count>3" class="form-control dropup">
+    	<option value="BW">Baden-Württemberg</option>
+	<option value="BY">Bayern</option>
+	<option value="Berlin">Berlin</option>
+	<option value="BB">Brandenburg</option>
+	<option value="HB">Bremen</option>
+	<option value="HH">Hamburg</option>
+	<option value="HE">Hessen</option>
+	<option value="MV">Mecklenburg-Vorpommern</option>
+	<option value="NDS">Niedersachsen</option>
+	<option value="NRW">Nordrhein-Westfalen</option>
+	<option value="RP">Rheinland-Pfalz</option>
+    	<option value="SL">Saarland</option>
+    	<option value="SN">Sachsen</option>
+    	<option value="SA">Sachsen-Anhalt</option>
+	<option value="SH">Schleswig-Holstein</option>
+	<option value="Thüringen">Thüringen</option>
+  </select>
+  <label for="land">Krankenhaus Träger Art</label>
+  <select ng-model="searchFilter.Krankenhaus_Traeger_Art" id="TraegerArt" name="TraegerArt" multiple data-selected-text-format="count>3" class="form-control dropup">
+    	<option value="privat">Privat</option>
+	<option value="freigemeinnützig">Freigemeinnützig</option>
+	<option value="öffentlich">Öffentlich</option>
+  </select>
+  <label for="price">Betten</label>
+  <div class="center-text margin-bottom-top-10">
+  {{searchFilter.Betten}}<br/>
+  <input class="width-100" id="Betten" ng-model="searchFilter.Anzahl_Betten" name="Betten" type="text"/>
+  </div>
+  <div class="center-text">
+  <br/>
+  <button ng-click="doFilter()" class="btn btn-default form-control">Filter anwenden</button>
+  </div>
+  </div>
+</div>
+<div class="panel panel-default display-panel">
+<div ng-if="resultsCount == 0 && notSearchedYet == true" id="qb-message-start-info" class="qb-messages alert alert-info">
+	Bitte geben Sie ein OPS/ICD Code ein um dessen Fallzahl für die Jahre 2006, 2008, 2010, 2012 und 2013 anzuzeigen.
+</div>
+<div ng-if="resultsCount == 0 && notSearchedYet == false" id="qb-message-no-result" class="qb-messages alert alert-warning">
+	Kein Ergebnis gefunden
+</div>
+<div ng-if="resultsCount > 0" id="qb-message-success" class="qb-messages alert alert-success">
+	{{resultsCount}} Krankenhäuser gefunden
+</div>
+<pre class="well" style="display:none;">{{searchFilter|json}}</pre>
+<h2 ng-if="resultsCount > 0">Gesamtfallzahl pro Jahr</h2>
+<div class="center-element avg-chart" style="width:600px;" ng-bind-html="totalCount | avgSumChart"></div>
+<div style="clear:both;"></div>
+
+<h2 ng-if="resultsCount > 0">Fallzahl pro Jahr für die einzelnen Krankenhäuser</h2>
+<div ng-repeat="krankenhaus in krankenhauser" class="list-group">
+<a href="#" class="list-group-item">
+<h4>{{krankenhaus.Krankenhaus_Name}}</h4>
+<div class="description-containter">
+	<div class="md-4">Betten : {{krankenhaus.Anzahl_Betten}}</div>
+	<div class="md-4">Art : {{krankenhaus.Krankenhaus_Traeger_Art}}</div>
+	<div class="md-4">Bundesland : {{krankenhaus.Bundesland}}</div>
+	<div class="md-4">Adresse : {{krankenhaus.Hausanschrift_Postleitzahl}} {{krankenhaus.Hausanschrift_Ort}}, {{krankenhaus.Hausanschrift_Strasse}} {{krankenhaus.Hausanschrift_Hausnummer}}</div>
+	<div class="md-4">GPS : {{krankenhaus.locationLat}} , {{krankenhaus.locationLng}}</div>
+</div>
+<div class="chart-container" ng-bind-html="krankenhaus.sum | sumChart"></div>
+<div style="clear:both;"></div>
+</a>
+</div>
+</div>
+</div>
+</body>
+</html>
